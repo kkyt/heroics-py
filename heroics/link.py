@@ -10,8 +10,7 @@ class Link(object):
 
     def format_path(self, schema, args, kwargs):
         path = schema['href']
-        m = PARAMETER_REGEX.match(path)
-        g = m.groups()
+        g = PARAMETER_REGEX.findall(path)
         n = len(g)
 
         if len(args) == n+1 and not kwargs and isinstance(args[-1], dict):
@@ -27,16 +26,22 @@ class Link(object):
 
     def call(self, args, kwargs, stream=False):
         s = self.schema
+        method = s['method'].lower()
+        params = None
         path, body = self.format_path(s, args, kwargs)
-        r = self.resource
-        c = r.client
-        h = json.dumps(c.options['default_headers'])
+        if method=='get' and body:
+            params = body
+            body = None
 
+        r = self.resource
+        c = r._client
+
+        #h = json.dumps(c.options['default_headers'])
         #log.info('Heroics.Link.run %s %s %s' % (c.service, r.name, self.name))
         #log.info('%s %s%s %s' % (s['method'].upper(), c.url, path, h)) 
         #if body: log.debug(simple_json.pretty_dumps(body))
 
-        r = c.http_client.http(s['method', path, body, stream=stream)
+        r = c._http_client.http(method, path, body, params=params, stream=stream)
 
         #if not stream: log.debug(simple_json.pretty_dumps(r))
         return r

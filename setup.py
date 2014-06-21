@@ -27,7 +27,7 @@ setup(
     ],
 
     scripts=[
-        'bin/heroics'
+        'bin/heroics-py'
     ],
 
     install_requires=[

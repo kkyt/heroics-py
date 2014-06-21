@@ -1,21 +1,22 @@
+from __future__ import absolute_import
+from .link import Link
 
 class Resource(object):
     def __init__(self, client, name):
-        self.client = client
-        self.name = name
-        self.links = {}
+        self._client = client
+        self._name = name
+        self._links = {}
 
-        for s in self.resource.schema['links']:
+        for s in self._schema['links']:
             method = '_'.join(s['title'].lower().split())
-            self.links[method] = Link(self, method)
+            self._links[method] = Link(self, method, s)
 
     @property
-    def schema(self):
+    def _schema(self):
         #hack
-        return self.client.schema['definitions'][self.name]
+        return self._client._schema['definitions'][self._name]
 
     def __getattr__(self, method):
-        return self.links[method]
-
+        return self._links[method]
 
 

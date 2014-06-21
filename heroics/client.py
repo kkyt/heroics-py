@@ -1,3 +1,6 @@
+#coding: utf8
+
+from __future__ import absolute_import
 
 import os
 import sys
@@ -5,7 +8,9 @@ import json
 
 from kuankr_api_utils.client import Client as HttpClient
 
-def create_heroics_client(service, **options)
+from .resource import Resource
+
+def create_heroics_client(service, **options):
     env = os.environ
 
     url = env['%s_URI' % service.upper()]
@@ -19,7 +24,8 @@ def create_heroics_client(service, **options)
     for x in ['api_client', 'auth_token', 'admin_token']:
         v = env.get('KUANKR_%s' % x.upper())
         if v:
-            headers['x_%s' % x] = v
+            h = ('x_%s' % x).replace('_', '-')
+            headers[h] = v
 
     dh = options.get('default_headers')
     if dh:
@@ -29,16 +35,16 @@ def create_heroics_client(service, **options)
 
 class Client(object):
     def __init__(self, schema, url, options):
-        self.schema = schema
-        self.url = url
-        self.options = options
-        self.http_client = HttpClient(url, headers=options['default_headers'])
+        self._schema = schema
+        self._url = url
+        self._options = options
+        self._http_client = HttpClient(url, headers=options['default_headers'])
 
-        self.resources = {}
-        for s in self.client.schema['properties']:
-            self.resource[s] = Resource(self, s)
+        self._resources = {}
+        for s in self._schema['properties']:
+            self._resources[s] = Resource(self, s)
 
     def __getattr__(self, resource):
-        return self.resources[resource]
+        return self._resources[resource]
 
 
