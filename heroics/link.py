@@ -13,9 +13,9 @@ class Link(object):
         g = PARAMETER_REGEX.findall(path)
         n = len(g)
 
-        if len(args) == n+1 and not kwargs and isinstance(args[-1], dict):
-            args = args[:-1]
+        if len(args) == n+1 and not kwargs:
             kwargs = args[-1]
+            args = args[:-1]
 
         if len(args) != n:
             raise Exception("wrong number of arguments (%s for %s)" % (len(args), n))
