@@ -21,7 +21,7 @@ class Link(object):
             raise Exception("wrong number of arguments (%s for %s)" % (len(args), n))
 
         for i in range(n):
-            path = PARAMETER_REGEX.sub(str(args[i]), path)
+            path = PARAMETER_REGEX.sub(str(args[i]), path, count=1)
         return path, kwargs
 
     def call(self, args, kwargs, stream=False):
