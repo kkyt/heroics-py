@@ -15,7 +15,11 @@ class Client(object):
         self._schema = schema
         self._url = url
         self._options = options
-        self._http_client = HttpClient(url, headers=options['default_headers'])
+        opts = {
+            'headers': options['default_headers'], 
+            'async_send': options.get('async_send', False)
+        }
+        self._http_client = HttpClient(url, **opts)
 
         self._resources = {}
         for s in self._schema['properties']:
