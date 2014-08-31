@@ -49,6 +49,10 @@ class Link(object):
     def __call__(self, *args, **kwargs):
         return self.call(args, kwargs)
 
+    #TODO: remove
     def stream(self, *args, **kwargs):
+        return self.call(args, kwargs, stream=True)
+
+    def as_stream(self, *args, **kwargs):
         return self.call(args, kwargs, stream=True)
 
