@@ -17,6 +17,8 @@ class Resource(object):
         return self._client._schema['definitions'][self._name]
 
     def __getattr__(self, method):
+        if method.startswith('_'):
+            raise AttributeError()
         return self._links[method]
 
 

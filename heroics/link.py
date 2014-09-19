@@ -1,4 +1,5 @@
 import re
+import requests
 
 PARAMETER_REGEX = re.compile(r'\{\([%\/a-zA-Z0-9_-]*\)\}')
 
@@ -8,7 +9,7 @@ class Link(object):
         self.name =name
         self.schema = schema
 
-    def format_path(self, schema, args, kwargs):
+    def _format_path(self, schema, args, kwargs):
         path = schema['href']
         g = PARAMETER_REGEX.findall(path)
         n = len(g)
@@ -24,11 +25,14 @@ class Link(object):
             path = PARAMETER_REGEX.sub(str(args[i]), path, count=1)
         return path, kwargs
 
+    def _get_method(self):
+        return self.schema['method'].lower()
+
     def call(self, args, kwargs, stream=False):
         s = self.schema
-        method = s['method'].lower()
+        method = self._get_method()
         params = None
-        path, body = self.format_path(s, args, kwargs)
+        path, body = self._format_path(s, args, kwargs)
         if method=='get' and body:
             params = body
             body = None
@@ -47,7 +51,13 @@ class Link(object):
         return r
 
     def __call__(self, *args, **kwargs):
-        return self.call(args, kwargs)
+        try:
+            return self.call(args, kwargs)
+        except requests.HTTPError as e:
+            if e.response.status_code==404 and self._get_method()=='get':
+                return None
+            else:
+                raise
 
     #TODO: remove
     def stream(self, *args, **kwargs):
