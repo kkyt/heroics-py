@@ -1,6 +1,8 @@
 import re
 import requests
 
+from kuankr_utils import log, debug
+
 PARAMETER_REGEX = re.compile(r'\{\([%\/a-zA-Z0-9_-]*\)\}')
 
 class Link(object):
