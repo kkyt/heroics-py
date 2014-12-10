@@ -59,10 +59,12 @@ class Link(object):
             if e.response.status_code==404 and self._get_method()=='get':
                 return None
             else:
+                log.error(e.response.content)
                 raise
 
     #TODO: remove
     def stream(self, *args, **kwargs):
+        log.error('to be removed')
         return self.call(args, kwargs, stream=True)
 
     def as_stream(self, *args, **kwargs):
