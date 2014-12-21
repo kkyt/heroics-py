@@ -30,7 +30,7 @@ class Link(object):
     def _get_method(self):
         return self.schema['method'].lower()
 
-    def call(self, args, kwargs, stream=False):
+    def call(self, args, kwargs, stream=False, content_type=None):
         s = self.schema
         method = self._get_method()
         params = None
@@ -47,7 +47,7 @@ class Link(object):
         #log.info('%s %s%s %s' % (s['method'].upper(), c.url, path, h)) 
         #if body: log.debug(simple_json.pretty_dumps(body))
 
-        r = c._http_client.http(method, path, body, params=params, stream=stream)
+        r = c._http_client.http(method, path, body, params=params, stream=stream, content_type=content_type)
 
         #if not stream: log.debug(simple_json.pretty_dumps(r))
         return r
@@ -61,6 +61,15 @@ class Link(object):
             else:
                 log.error(e.response.content)
                 raise
+
+    def binary(self, *args, **kwargs):
+        return self.call(args, kwargs, content_type='application/octet-stream')
+
+    def msgpack(self, *args, **kwargs):
+        return self.call(args, kwargs, content_type='application/msgpack')
+
+    def msgpack_stream(self, *args, **kwargs):
+        return self.call(args, kwargs, content_type='application/msgpack', stream=True)
 
     #TODO: remove
     def stream(self, *args, **kwargs):

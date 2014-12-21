@@ -27,6 +27,7 @@ class Client(object):
         self._options = options
         opts = {
             'headers': normalize_headers(options['default_headers']), 
+            'content_type': options.get('content_type'),
             'async_send': options.get('async_send', False)
         }
         self._http_client = HttpClient(url, **opts)
