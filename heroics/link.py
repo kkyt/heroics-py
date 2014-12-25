@@ -3,7 +3,7 @@ import requests
 
 from kuankr_utils import log, debug
 
-PARAMETER_REGEX = re.compile(r'\{\([%\/a-zA-Z0-9_-]*\)\}')
+from .utils import PARAMETER_REGEX, is_generator
 
 class Link(object):
     def __init__(self, resource, name, schema):
@@ -11,21 +11,29 @@ class Link(object):
         self.name =name
         self.schema = schema
 
-    def _format_path(self, schema, args, kwargs):
+    def _format_path(self, method, schema, args, kwargs):
         path = schema['href']
         g = PARAMETER_REGEX.findall(path)
         n = len(g)
 
-        if len(args) == n+1 and not kwargs:
-            kwargs = args[-1]
+        #body is a generator
+        if len(args) == n+1:
+            body = args[-1]
             args = args[:-1]
+            params = kwargs
+        elif method=='get':
+            body = None
+            params = kwargs
+        else:
+            body = kwargs
+            params = None
 
         if len(args) != n:
             raise Exception("wrong number of arguments (%s for %s)" % (len(args), n))
 
         for i in range(n):
             path = PARAMETER_REGEX.sub(str(args[i]), path, count=1)
-        return path, kwargs
+        return path, body, params
 
     def _get_method(self):
         return self.schema['method'].lower()
@@ -33,11 +41,7 @@ class Link(object):
     def call(self, args, kwargs, stream=False, content_type=None):
         s = self.schema
         method = self._get_method()
-        params = None
-        path, body = self._format_path(s, args, kwargs)
-        if method=='get' and body:
-            params = body
-            body = None
+        path, body, params = self._format_path(method, s, args, kwargs)
 
         r = self.resource
         c = r._client
@@ -64,6 +68,10 @@ class Link(object):
 
     def binary(self, *args, **kwargs):
         return self.call(args, kwargs, content_type='application/octet-stream')
+
+    def binary_stream(self, *args, **kwargs):
+        return self.call(args, kwargs, content_type='application/octet-stream', stream=True)
+
 
     def msgpack(self, *args, **kwargs):
         return self.call(args, kwargs, content_type='application/msgpack')
