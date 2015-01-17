@@ -21,6 +21,15 @@ class Link(object):
             body = args[-1]
             args = args[:-1]
             params = kwargs
+            #NOTE:
+            #convert true/false params to 1/0
+            for k,v in params.items():
+                if isinstance(v, bool):
+                    if v==True:
+                        v = 1
+                    else:
+                        v = 0
+                    params[k] = v
         elif method=='get':
             body = None
             params = kwargs
