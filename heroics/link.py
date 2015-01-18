@@ -11,6 +11,27 @@ class Link(object):
         self.name =name
         self.schema = schema
 
+    def _to_url_param(self, v):
+        m = self._to_url_param
+        if isinstance(v, bool):
+            if v==True:
+                v = '1'
+            else:
+                v = '0'
+
+        elif isinstance(v, list):
+            v = ','.join([m(x) for x in v])
+
+        #TODO?
+        elif isinstance(v, dict):
+            kv = ['%s:%s' % (m(k), m(v)) for k,v in v.items()]
+            v = ','.join(kv)
+
+        else:
+            v = str(v)
+
+        return v
+
     def _format_path(self, method, schema, args, kwargs):
         path = schema['href']
         g = PARAMETER_REGEX.findall(path)
@@ -24,12 +45,7 @@ class Link(object):
             #NOTE:
             #convert true/false params to 1/0
             for k,v in params.items():
-                if isinstance(v, bool):
-                    if v==True:
-                        v = 1
-                    else:
-                        v = 0
-                    params[k] = v
+                params[k] = self._to_url_param(v)
         elif method=='get':
             body = None
             params = kwargs
