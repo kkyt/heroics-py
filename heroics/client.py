@@ -22,11 +22,14 @@ def normalize_headers(h):
 
 class Client(object):
     def __init__(self, schema, url, options):
+        #NOTE: must prefix with _
         self._schema = schema
         self._url = url
         self._options = options
+
+        self._headers = normalize_headers(options['default_headers'])
         opts = {
-            'headers': normalize_headers(options['default_headers']), 
+            'headers': self._headers, 
             'content_type': options.get('content_type'),
             'async_send': options.get('async_send', False)
         }
@@ -36,6 +39,10 @@ class Client(object):
         for s in self._schema['properties']:
             res_name = s.replace('-','_')
             self._resources[res_name] = Resource(self, s)
+
+    def _set_headers(self, headers):
+        headers = normalize_headers(headers)
+        self._http_client.set_headers(headers)
 
     def __getattr__(self, resource):
         if resource.startswith('_'):

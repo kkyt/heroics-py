@@ -63,7 +63,7 @@ class Link(object):
     def _get_method(self):
         return self.schema['method'].lower()
 
-    def call(self, args, kwargs, stream=False, content_type=None):
+    def call(self, args, kwargs, stream=False, content_type=None, headers=None):
         s = self.schema
         method = self._get_method()
         path, body, params = self._format_path(method, s, args, kwargs)
@@ -71,14 +71,8 @@ class Link(object):
         r = self.resource
         c = r._client
 
-        #h = json.dumps(c.options['default_headers'])
-        #log.info('Heroics.Link.run %s %s %s' % (c.service, r.name, self.name))
-        #log.info('%s %s%s %s' % (s['method'].upper(), c.url, path, h)) 
-        #if body: log.debug(simple_json.pretty_dumps(body))
+        r = c._http_client.http(method, path, body, params=params, stream=stream, content_type=content_type, headers=headers)
 
-        r = c._http_client.http(method, path, body, params=params, stream=stream, content_type=content_type)
-
-        #if not stream: log.debug(simple_json.pretty_dumps(r))
         return r
 
     def __call__(self, *args, **kwargs):
