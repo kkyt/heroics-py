@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='heroics',
-    version='0.0.1',
+    version='0.1.0',
 
     author='dev',
     author_email='dev@agutong.com',
