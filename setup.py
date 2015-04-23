@@ -18,6 +18,11 @@ setup(
       'heroics',
     ],
 
+    entry_points='''
+        [console_scripts]
+        heroics=heroics.cli:main
+    ''',
+
     package_data = {
         #'heroics': ['config/*.yml'],
     },
@@ -27,7 +32,6 @@ setup(
     ],
 
     scripts=[
-        'bin/heroics-py'
     ],
 
     install_requires=[
